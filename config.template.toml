@@ -1,0 +1,6 @@
+[server]
+port = 8080
+
+[database]
+name = "starkship_server"
+connection_string = "xxxxxx"
