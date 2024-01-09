@@ -2,12 +2,17 @@
 mod utils;
 mod config;
 mod models;
-use axum::{http::StatusCode, routing::get, Router};
+use axum::{http::StatusCode, Router};
+use axum_auto_routes::route;
 use mongodb::{bson::doc, options::ClientOptions, Client};
 use std::net::SocketAddr;
 use std::sync::Arc;
-
+use std::sync::Mutex;
 use tower_http::cors::{Any, CorsLayer};
+
+lazy_static::lazy_static! {
+    pub static ref ROUTE_REGISTRY: Mutex<Vec<Router>> = Mutex::new(Vec::new());
+}
 
 #[tokio::main]
 async fn main() {
@@ -18,7 +23,6 @@ async fn main() {
         .unwrap();
 
     let client = reqwest::Client::builder().build().unwrap();
-
     let shared_state = Arc::new(models::AppState {
         conf: conf.clone(),
         db: Client::with_options(client_options)
@@ -38,10 +42,10 @@ async fn main() {
     }
 
     let cors = CorsLayer::new().allow_headers(Any).allow_origin(Any);
-    let app = Router::new()
-        .route("/", get(root))
-        .with_state(shared_state)
-        .layer(cors);
+    let app = ROUTE_REGISTRY.lock().unwrap().clone().into_iter().fold(
+        Router::new().with_state(shared_state).layer(cors),
+        |acc, r| acc.merge(r),
+    );
 
     let addr = SocketAddr::from(([0, 0, 0, 0], conf.server.port));
     println!("server: listening on http://0.0.0.0:{}", conf.server.port);
@@ -51,6 +55,7 @@ async fn main() {
         .unwrap();
 }
 
+#[route(get, "/")]
 async fn root() -> (StatusCode, String) {
     (
         StatusCode::ACCEPTED,
