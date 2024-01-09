@@ -2,5 +2,5 @@
 port = 8080
 
 [database]
-name = "starkship_server"
+name = "example_name"
 connection_string = "xxxxxx"
