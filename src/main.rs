@@ -9,9 +9,10 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use std::sync::Mutex;
 use tower_http::cors::{Any, CorsLayer};
+use utils::WithState;
 
 lazy_static::lazy_static! {
-    pub static ref ROUTE_REGISTRY: Mutex<Vec<Router>> = Mutex::new(Vec::new());
+    pub static ref ROUTE_REGISTRY: Mutex<Vec<Box<dyn WithState>>> = Mutex::new(Vec::new());
 }
 
 #[tokio::main]
@@ -43,8 +44,8 @@ async fn main() {
 
     let cors = CorsLayer::new().allow_headers(Any).allow_origin(Any);
     let app = ROUTE_REGISTRY.lock().unwrap().clone().into_iter().fold(
-        Router::new().with_state(shared_state).layer(cors),
-        |acc, r| acc.merge(r),
+        Router::new().with_state(shared_state.clone()).layer(cors),
+        |acc, r| acc.merge(r.to_router(shared_state.clone())),
     );
 
     let addr = SocketAddr::from(([0, 0, 0, 0], conf.server.port));

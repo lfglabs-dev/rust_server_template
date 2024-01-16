@@ -1,10 +1,14 @@
 use axum::{
+    body::Body,
     http::StatusCode,
     response::{IntoResponse, Response},
+    Router,
 };
 
 use starknet::core::types::FieldElement;
-use std::fmt::Write;
+use std::{fmt::Write, sync::Arc};
+
+use crate::models::AppState;
 
 #[macro_export]
 macro_rules! pub_struct {
@@ -32,4 +36,27 @@ pub fn to_hex(felt: FieldElement) -> String {
         write!(&mut result, "{:02x}", byte).unwrap();
     }
     result
+}
+
+// required for axum_auto_routes
+pub trait WithState: Send {
+    fn to_router(self: Box<Self>, shared_state: Arc<AppState>) -> Router;
+
+    fn box_clone(&self) -> Box<dyn WithState>;
+}
+
+impl WithState for Router<Arc<AppState>, Body> {
+    fn to_router(self: Box<Self>, shared_state: Arc<AppState>) -> Router {
+        self.with_state(shared_state)
+    }
+
+    fn box_clone(&self) -> Box<dyn WithState> {
+        Box::new((*self).clone())
+    }
+}
+
+impl Clone for Box<dyn WithState> {
+    fn clone(&self) -> Box<dyn WithState> {
+        self.box_clone()
+    }
 }

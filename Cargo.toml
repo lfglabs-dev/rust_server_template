@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 starknet-id = { git = "https://github.com/starknet-id/starknetid.rs", rev = "2b30c2453b96789a628c86d2edebb1023fa2e77d" }
 starknet = { git = "https://github.com/xJonathanLEI/starknet-rs", rev = "c974e5cb42e8d8344cee910b76005ec46b4dd3ed" }
-axum_auto_routes = { git = "https://github.com/Th0rgal/axum_auto_routes", rev = "00b5496b07da73beb0e438b8607764006cbc72ef" }
+axum_auto_routes = { git = "https://github.com/Th0rgal/axum_auto_routes", rev = "f9e1d2083e887cd264642359c4aa851938da6f09" }
 axum = "0.6.17"
 toml = "0.5.10"
 serde = { version = "1.0.152", features = ["derive"] }
