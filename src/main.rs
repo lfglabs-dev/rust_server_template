@@ -2,6 +2,7 @@
 mod utils;
 mod config;
 mod models;
+mod logger;
 use axum::{http::StatusCode, Router};
 use axum_auto_routes::route;
 use mongodb::{bson::doc, options::ClientOptions, Client};
@@ -19,6 +20,7 @@ lazy_static::lazy_static! {
 async fn main() {
     println!("quest_server: starting v{}", env!("CARGO_PKG_VERSION"));
     let conf = config::load();
+    let logger = logger::Logger::new(&conf.watchtower);
     let client_options = ClientOptions::parse(&conf.database.connection_string)
         .await
         .unwrap();
@@ -29,6 +31,7 @@ async fn main() {
         db: Client::with_options(client_options)
             .unwrap()
             .database(&conf.database.name),
+        logger,
     });
     if shared_state
         .db

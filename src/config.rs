@@ -9,9 +9,25 @@ pub_struct!(Clone, Deserialize; Database {
     connection_string: String,
 });
 
+pub_struct!(Clone, Deserialize; Watchtower {
+    enabled : bool,
+    endpoint: String,
+    app_id: String,
+    token: String,
+    types: WatchtowerTypes,
+});
+
+pub_struct!(Clone, Deserialize; WatchtowerTypes {
+    info: String,
+    warning: String,
+    severe: String,
+    debug: String,
+});
+
 pub_struct!(Clone, Deserialize;  Config {
     server: Server,
     database: Database,
+    watchtower: Watchtower,
 });
 
 pub fn load() -> Config {
