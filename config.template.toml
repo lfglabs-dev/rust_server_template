@@ -4,3 +4,14 @@ port = 8080
 [database]
 name = "example_name"
 connection_string = "xxxxxx"
+
+[watchtower]
+enabled = false
+endpoint = "xxxxxxx"
+app_id = "XXXXXXXXXXXXXXXXX"
+token = "XXXXXXXXXXXXXXXXX"
+[watchtower.types]
+info = "sepolia/info"
+warning = "sepolia/warning"
+severe = "sepolia/severe"
+debug = "sepolia/debug"
